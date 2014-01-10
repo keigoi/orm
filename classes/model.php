@@ -791,9 +791,9 @@ class Model implements \ArrayAccess, \Iterator, \Sanitization
 			$new = false;
 		}
 
+		$properties = $this->properties();
 		if ($new)
 		{
-			$properties = $this->properties();
 			foreach ($properties as $prop => $settings)
 			{
 				if (array_key_exists($prop, $data))
@@ -811,7 +811,14 @@ class Model implements \ArrayAccess, \Iterator, \Sanitization
 		else
 		{
 			$this->_update_original($data);
-			$this->_data = array_merge($this->_data, $data);
+            $obj = array();
+			foreach ($properties as $prop => $settings)
+            {
+                $obj[$prop] = $data[$prop];
+                unset($data[$prop]);
+            }
+			$this->_data = array_merge($this->_data, $obj);
+            $this->_custom_data = $data;
 
 			if ($view and array_key_exists($view, $this->views()))
 			{
